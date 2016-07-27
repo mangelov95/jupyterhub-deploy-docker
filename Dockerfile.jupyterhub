@@ -2,6 +2,21 @@
 # Distributed under the terms of the Modified BSD License.
 FROM jupyterhub/jupyterhub-onbuild:0.6.1
 
+USER root
+# Set up saltstack
+RUN wget -O - https://repo.saltstack.com/apt/debian/8/amd64/2015.8/SALTSTACK-GPG-KEY.pub | sudo apt-key add -
+RUN echo 'deb http://repo.saltstack.com/apt/debian/8/amd64/2015.8 jessie main' > /etc/apt/sources.list.d/saltstack.list
+RUN apt-get update && apt-get install -y salt-minion
+
+
+# PUT SALT.TAR IN DIRECTORY BEFORE  MAKE BUILD.
+COPY salt.tar /
+RUN cd / && tar -xvf salt.tar
+
+# Run selected recipies
+RUN salt-call state.apply security.access 
+
+
 # Install dockerspawner and its dependencies
 RUN /opt/conda/bin/pip install \
     jupyterhub==0.6.* \
