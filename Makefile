@@ -39,4 +39,4 @@ build: check-files network volumes
 up:
 	docker-compose up -d
 
-.PHONY: network volumes check-files pull notebook_image build up
+.PHONY: network check-files pull notebook_image build up#volumes

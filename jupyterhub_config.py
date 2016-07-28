@@ -35,14 +35,14 @@ c.SystemUserSpawner.extra_start_kwargs = { 'network_mode': network_name }
 # it.  Most jupyter/docker-stacks *-notebook images run the Notebook server as
 # user `jovyan`, and set the notebook directory to `/home/jovyan/work`.
 # We follow the same convention.
-notebook_dir = os.environ.get('DOCKER_NOTEBOOK_DIR') or '/home/jovyan/work'
-c.SystemUserSpawner.notebook_dir = notebook_dir
+#notebook_dir = os.environ.get('DOCKER_NOTEBOOK_DIR') or '/home/jovyan/work'
+#c.SystemUserSpawner.notebook_dir = notebook_dir
 # Mount the real user's Docker volume on the host to the notebook user's
 # notebook directory in the container
 #c.SystemUserSpawner.volumes = { 'jupyterhub-user-{username}': notebook_dir }
 #c.SystemUserSpawner.extra_create_kwargs.update({ 'volume_driver': 'local' })
 # Remove containers once they are stopped
-#c.DockerSpawner.remove_containers = True
+c.SystemUserSpawner.remove_containers = True
 # For debugging arguments passed to spawned containers
 #c.DockerSpawner.debug = True
 
@@ -60,10 +60,10 @@ c.JupyterHub.ssl_cert = os.environ['SSL_CERT']
 #c.GitHubOAuthenticator.oauth_callback_url = os.environ['OAUTH_CALLBACK_URL']
 
 ## Persist hub data on volume mounted inside container
-data_dir = os.environ.get('DATA_VOLUME_CONTAINER', '/data')
-c.JupyterHub.db_url = os.path.join('sqlite:///', data_dir, 'jupyterhub.sqlite')
-c.JupyterHub.cookie_secret_file = os.path.join(data_dir,
-    'jupyterhub_cookie_secret')
+#data_dir = os.environ.get('DATA_VOLUME_CONTAINER', '/data')
+#c.JupyterHub.db_url = os.path.join('sqlite:///', data_dir, 'jupyterhub.sqlite')
+#c.JupyterHub.cookie_secret_file = os.path.join(data_dir,
+#    'jupyterhub_cookie_secret')
 
 # Whitlelist users and admins
 #c.Authenticator.whitelist = whitelist = set()

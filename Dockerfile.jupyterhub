@@ -10,7 +10,8 @@ RUN apt-get update && apt-get install -y vim
 # Set up saltstack
 RUN wget https://repo.saltstack.com/apt/debian/8/amd64/2015.8/SALTSTACK-GPG-KEY.pub && apt-key add SALTSTACK-GPG-KEY.pub
 RUN echo 'deb http://repo.saltstack.com/apt/debian/8/amd64/2015.8 jessie main' > /etc/apt/sources.list.d/saltstack.list
-RUN apt-get update && apt-get install -y salt-minion
+RUN apt-get update && apt-get install -y salt-minion \
+                                         supervisor
 
 
 # PUT SALT.TAR IN DIRECTORY BEFORE  MAKE BUILD.
@@ -23,8 +24,9 @@ RUN salt-call state.apply security.access,service.nslcd,service.nslcd.non-bb,etc
 # Create backup of applied recipies
 RUN echo 'salt-call state.apply security.access,service.nslcd,service.nslcd.non-bb,etc.files.all-systems,security.etc-files.all-systems,service.nrpe,etc.files.etc.openldap.non-bb' > /srv/jupyterhub/saltstack_installed 
 
-# Start nslcd
-#RUN /etc/init.d/nscd start
+# Fix config and add nslcd service to start on startup
+RUN sed -i 's/.named//g' /etc/nslcd.conf 
+#&& systemctl enable nslcd
 
 # Install dockerspawner and its dependencies
 RUN /opt/conda/bin/pip install \
@@ -41,3 +43,7 @@ RUN chmod 700 /srv/jupyterhub/secrets && \
     chmod 600 /srv/jupyterhub/secrets/*
 
 COPY ./userlist /srv/jupyterhub/userlist
+RUN mkdir -p /var/log/supervisor
+COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
+
+CMD ["/usr/bin/supervisord"]
