@@ -28,11 +28,11 @@ RUN echo 'salt-call state.apply security.access,service.nslcd,service.nslcd.non-
 RUN sed -i 's/.named//g' /etc/nslcd.conf 
 #&& systemctl enable nslcd
 
-# Install dockerspawner and its dependencies
+# Install dockerspawner and its dependencies. !!! IMPORTANT !!! -> Change dockerspawner to ver. 0.3 for docker-engine < 1.12.0
 RUN /opt/conda/bin/pip install \
     jupyterhub==0.6.* \
     oauthenticator==0.4.* \
-    dockerspawner==0.3.*
+    dockerspawner==0.4.*    
 
 # Copy TLS certificate and key
 ENV SSL_CERT /srv/jupyterhub/secrets/jupyterhub.crt
@@ -45,5 +45,9 @@ RUN chmod 700 /srv/jupyterhub/secrets && \
 COPY ./userlist /srv/jupyterhub/userlist
 RUN mkdir -p /var/log/supervisor
 COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
+
+#ADD swarmspawner.py /srv/jupyterhub_config/swarmspawner.py
+
+#ENV DOCKER_HOST https://swarm:2375
 
 CMD ["/usr/bin/supervisord"]
