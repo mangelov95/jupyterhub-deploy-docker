@@ -14,7 +14,7 @@ c = get_config()
 #c.JupyterHub.spawner_class = 'dockerspawner.DockerSpawner'
 c.JupyterHub.spawner_class = 'dockerspawner.SystemUserSpawner'
 #c.JupyterHub.spawner_class = 'swarmspawner.SwarmSpawner'
-c.SystemUserSpawner.container_image = 'mgangelov/notebook_bham'
+c.SystemUserSpawner.container_image = os.environ['DOCKER_NOTEBOOK_IMAGE']
 
 # Spawn containers from this image
 #c.DockerSpawner.container_image = os.environ['DOCKER_NOTEBOOK_IMAGE']
