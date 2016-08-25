@@ -21,19 +21,11 @@ services:
       # TLS certs for Docker Swarm
       - "${DOCKER_CERT_PATH}:${DOCKER_CERT_PATH}:rw"
       # Bind Docker volume on host for JupyterHub database and cookie secrets
-<<<<<<< HEAD
       #- "data:${DATA_VOLUME_CONTAINER}"
-=======
-#      - "data:${DATA_VOLUME_CONTAINER}"
->>>>>>> 822cd15a52b35452b328c9af9055ca89ea013c74
     ports:
       - "443:443"
     environment:
       # All containers will join this network
-      "constraint:node=": "swarm-master"
-      DOCKER_TLS_VERIFY: ${DOCKER_TLS_VERIFY}
-      DOCKER_HOST: ${DOCKER_HOST}
-      DOCKER_CERT_PATH: ${DOCKER_CERT_PATH}
       DOCKER_NETWORK_NAME: ${DOCKER_NETWORK_NAME}
       # JupyterHub will spawn this Notebook image for users
       DOCKER_NOTEBOOK_IMAGE: ${DOCKER_NOTEBOOK_IMAGE}
