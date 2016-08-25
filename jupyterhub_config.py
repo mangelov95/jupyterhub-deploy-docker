@@ -47,16 +47,6 @@ c.SystemUserSpawner.remove_containers = True
 # For debugging arguments passed to spawned containers
 #c.DockerSpawner.debug = True
 
-# TLS CONFIG FOR DOCKER SWARM
-
-c.SystemUserSpawner.tls_verify = True
-c.SystemUserSpawner.tls_ca = os.environ['DOCKER_CERT_PATH'] + '/ca.pem'
-c.SystemUserSpawner.tls_cert = os.environ['DOCKER_CERT_PATH'] + '/cert.pem' 
-c.SystemUserSpawner.tls_key = os.environ['DOCKER_CERT_PATH'] + '/key.pem' 
-
-# END OF TLS CONFIG FOR DOCKER SWARM
-
-
 # User containers will access hub by container name on the Docker network
 c.JupyterHub.hub_ip = 'jupyterhub'
 c.JupyterHub.hub_port = 8000
