@@ -51,8 +51,8 @@ c.SystemUserSpawner.remove_containers = True
 
 c.SystemUserSpawner.tls_verify = True
 c.SystemUserSpawner.tls_ca = os.environ['DOCKER_CERT_PATH'] + '/ca.pem'
-c.SystemUserSpawner.tls_cert = os.environ['DOCKER_CERT_PATH'] + '/cert.pem' 
-c.SystemUserSpawner.tls_key = os.environ['DOCKER_CERT_PATH'] + '/key.pem' 
+c.SystemUserSpawner.tls_cert = os.environ['DOCKER_CERT_PATH'] + '/novalocal-cert.pem' 
+c.SystemUserSpawner.tls_key = os.environ['DOCKER_CERT_PATH'] + '/novalocal-priv-key.pem' 
 
 # END OF TLS CONFIG FOR DOCKER SWARM
 

@@ -19,7 +19,7 @@ services:
       # within the container
       - "/var/run/docker.sock:/var/run/docker.sock:rw"
       # TLS certs for Docker Swarm
-      - "${DOCKER_CERT_PATH}:${DOCKER_CERT_PATH}:rw"
+      - "/root/.certs:/root/.certs:rw"
       # Bind Docker volume on host for JupyterHub database and cookie secrets
       #- "data:${DATA_VOLUME_CONTAINER}"
     ports:
@@ -27,7 +27,7 @@ services:
     environment:
       # All containers will join this network
       "constraint:node=": "swarm-master"
-      DOCKER_TLS_VERIFY: ${DOCKER_TLS_VERIFY}
+      DOCKER_TLS_VERIFY: 1
       DOCKER_HOST: ${DOCKER_HOST}
       DOCKER_CERT_PATH: ${DOCKER_CERT_PATH}
       DOCKER_NETWORK_NAME: ${DOCKER_NETWORK_NAME}

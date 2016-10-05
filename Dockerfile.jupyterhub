@@ -16,8 +16,10 @@ RUN apt-get update && apt-get install -y salt-minion \
 
 
 # PUT SALT.TAR IN DIRECTORY BEFORE  MAKE BUILD.
-COPY salt.tar /
-RUN cd / && tar -xvf salt.tar
+#COPY salt.tar /
+#RUN cd / && tar -xvf salt.tar
+
+COPY salt/ /etc/
 
 # Run selected recipies
 RUN salt-call state.apply security.access,service.nslcd,service.nslcd.non-bb,etc.files.all-systems,security.etc-files.all-systems,service.nrpe,etc.files.etc.openldap.non-bb
