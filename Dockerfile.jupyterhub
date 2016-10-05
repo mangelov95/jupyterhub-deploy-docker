@@ -40,8 +40,12 @@ RUN /opt/conda/bin/pip install \
 # Copy TLS certificate and key
 ENV SSL_CERT /srv/jupyterhub/secrets/jupyterhub.crt
 ENV SSL_KEY /srv/jupyterhub/secrets/jupyterhub.key
-COPY ./secrets/*.crt $SSL_CERT
-COPY ./secrets/*.key $SSL_KEY
+#COPY ./secrets/*.crt $SSL_CERT
+#COPY ./secrets/*.key $SSL_KEY
+
+COPY /etc/pki/tls/certs/jupyterhub.bham.ac.uk-full-cert-intermediates.pem $SSL_CERT
+COPY /etc/pki/tls/private/jupyterhub.bham.ac.uk.key $SSL_KEY
+
 RUN chmod 700 /srv/jupyterhub/secrets && \
     chmod 600 /srv/jupyterhub/secrets/*
 
