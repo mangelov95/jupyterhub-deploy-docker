@@ -26,7 +26,7 @@ services:
       - "443:443"
     environment:
       # All containers will join this network
-      "constraint:node=": "swarm-master"
+      "constraint:node=": "hub-swarm-manager-*"
       DOCKER_TLS_VERIFY: 1
       DOCKER_HOST: ${DOCKER_HOST}
       DOCKER_CERT_PATH: ${DOCKER_CERT_PATH}
