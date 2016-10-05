@@ -11,21 +11,21 @@ volumes:
 self-signed-cert:
 	# make a self-signed cert
 
-secrets/jupyterhub.crt:
-	@echo "Need an SSL certificate in secrets/jupyterhub.crt"
-	@exit 1
+#secrets/jupyterhub.crt:
+#	@echo "Need an SSL certificate in secrets/jupyterhub.crt"
+#	@exit 1
 
-secrets/jupyterhub.key:
-	@echo "Need an SSL key in secrets/jupyterhub.key"
-	@exit 1
+#secrets/jupyterhub.key:
+#	@echo "Need an SSL key in secrets/jupyterhub.key"
+#	@exit 1
 
-userlist:
-	@echo "Add usernames, one per line, to ./userlist, such as:"
-	@echo "    zoe admin"
-	@echo "    wash"
-	@exit 1
+#userlist:
+#	@echo "Add usernames, one per line, to ./userlist, such as:"
+#	@echo "    zoe admin"
+#	@echo "    wash"
+#	@exit 1
 
-check-files: secrets/jupyterhub.crt secrets/jupyterhub.key userlist
+#check-files: secrets/jupyterhub.crt secrets/jupyterhub.key userlist
 	# fail in an informative way if files don't exist
 
 pull:
