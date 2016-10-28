@@ -18,7 +18,7 @@ RUN pip2 install lightning-python #Added to satisfy Python2 notebooks
 # End of additional Python libraries
 
 RUN apt-get update && apt-get install -y libpam-ldapd \
-                                         libnss-ldapd
+                                         libnss-ldapd \
 					 supervisor
 COPY ./files/ldap.conf /etc/ldap.conf
 COPY ./files/nsswitch.conf /etc/nsswitch.conf
