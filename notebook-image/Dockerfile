@@ -23,11 +23,18 @@ RUN apt-get update && apt-get install -y libpam-ldapd \
 COPY ./files/ldap.conf /etc/ldap.conf
 COPY ./files/nsswitch.conf /etc/nsswitch.conf
 COPY ./files/profile.d/xauthority.sh /etc/profile.d/xauthority.sh
-COPY ./files/profile.d/OMPI_openib_if_include.sh /etc/profile.d/OMPI_openib_if_include.sh
+COPY ./files/profile.d/OMPI_openib_if_include.sh /etc/profile.d/OMPI_openib_if_include$
+COPY ./files/krb5.conf /etc/krb5.conf
 COPY ./files/ldap.conf /etc/ldap.conf
 COPY ./files/nslcd.conf /etc/nslcd.conf
+COPY ./files/hub_hosts /etc/hosts
 
+
+# Fix config and add nslcd service to start on startup
 RUN sed -i 's/.named//g' /etc/nslcd.conf
+#&& systemctl enable nslcd
+
+## Copy and edit access.conf
 
 COPY ./files/security/access.conf /etc/security/access.conf
 RUN sed -i -e 's/- : ALL/+ : ALL/g' /etc/security/access.conf
