@@ -19,6 +19,7 @@ RUN pip2 install lightning-python #Added to satisfy Python2 notebooks
 
 RUN apt-get update && apt-get install -y libpam-ldapd \
                                          libnss-ldapd
+					 supervisor
 COPY ./files/ldap.conf /etc/ldap.conf
 COPY ./files/nsswitch.conf /etc/nsswitch.conf
 COPY ./files/profile.d/xauthority.sh /etc/profile.d/xauthority.sh
@@ -31,5 +32,6 @@ RUN sed -i 's/.named//g' /etc/nslcd.conf
 COPY ./files/security/access.conf /etc/security/access.conf
 RUN sed -i -e 's/- : ALL/+ : ALL/g' /etc/security/access.conf
 
+COPY ./files/supervisord_notebook.conf /etc/supervisor/conf.d/supervisord.conf
 
-CMD ["sh", "/srv/singleuser/systemuser.sh"]
+#CMD ["sh", "/srv/singleuser/systemuser.sh"]
