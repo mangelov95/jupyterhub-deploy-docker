@@ -6,55 +6,85 @@ FROM jupyterhub/jupyterhub-onbuild:0.6.1
 USER root
 
 # Install vim :(((
-RUN apt-get update && apt-get install -y vim
+#RUN apt-get update && apt-get install -y vim
 
 # Set up saltstack
-RUN wget https://repo.saltstack.com/apt/debian/8/amd64/2015.8/SALTSTACK-GPG-KEY.pub && apt-key add SALTSTACK-GPG-KEY.pub
-RUN echo 'deb http://repo.saltstack.com/apt/debian/8/amd64/2015.8 jessie main' > /etc/apt/sources.list.d/saltstack.list
-RUN apt-get update && apt-get install -y salt-minion \
-                                         supervisor
+#RUN wget https://repo.saltstack.com/apt/debian/8/amd64/2015.8/SALTSTACK-GPG-KEY.pub && apt-key add SALTSTACK-GPG-KEY.pub
+#RUN echo 'deb http://repo.saltstack.com/apt/debian/8/amd64/2015.8 jessie main' > /etc/apt/sources.list.d/saltstack.list
+#RUN apt-get update && apt-get install -y salt-minion \
+#                                         supervisor
 
 
 # PUT SALT.TAR IN DIRECTORY BEFORE  MAKE BUILD.
 #COPY salt.tar /
 #RUN cd / && tar -xvf salt.tar
 
-COPY salt/ /etc/
+#COPY salt/ /etc/
 
 # Run selected recipies
-RUN salt-call state.apply security.access,service.nslcd,service.nslcd.non-bb,etc.files.all-systems,security.etc-files.all-systems,service.nrpe,etc.files.etc.openldap.non-bb
+#RUN salt-call state.apply security.access,service.nslcd,service.nslcd.non-bb,etc.files.all-systems,security.etc-files.all-systems,service.nrpe,etc.files.etc.openldap.non-bb
 
 # Create backup of applied recipies
-RUN echo 'salt-call state.apply security.access,service.nslcd,service.nslcd.non-bb,etc.files.all-systems,security.etc-files.all-systems,service.nrpe,etc.files.etc.openldap.non-bb' > /srv/jupyterhub/saltstack_installed 
+#RUN echo 'salt-call state.apply security.access,service.nslcd,service.nslcd.non-bb,etc.files.all-systems,security.etc-files.all-systems,service.nrpe,etc.files.etc.openldap.non-bb' > /srv/jupyterhub/saltstack_installed 
+
+RUN apt-get update && apt-get install -y vim \
+                                         supervisor \
+#                                         nscld \
+                                         libpam-ldapd \
+                                         libnss-ldapd \
+                                         libpam-krb5 \
+                                         krb5-user \
+                                         nagios-nrpe-server \
+                                         nagios-plugins
+
+
+COPY ./files/ldap.conf /etc/ldap.conf
+COPY ./files/nsswitch.conf /etc/nsswitch.conf
+COPY ./files/profile.d/xauthority.sh /etc/profile.d/xauthority.sh
+COPY ./files/profile.d/OMPI_openib_if_include.sh /etc/profile.d/OMPI_openib_if_include.sh
+COPY ./files/krb5.conf /etc/krb5.conf
+COPY ./files/ldap.conf /etc/ldap.conf
+COPY ./files/nslcd.conf /etc/nslcd.conf
+COPY ./files/hub_hosts /etc/hosts
+
 
 # Fix config and add nslcd service to start on startup
-RUN sed -i 's/.named//g' /etc/nslcd.conf 
+RUN sed -i 's/.named//g' /etc/nslcd.conf
 #&& systemctl enable nslcd
+
+## Copy and edit access.conf
+
+COPY ./files/security/access.conf /etc/security/access.conf
+RUN sed -i -e 's/- : ALL/+ : ALL/g' /etc/security/access.conf
 
 # Install dockerspawner and its dependencies. !!! IMPORTANT !!! -> Change dockerspawner to ver. 0.3 for docker-engine < 1.12.0
 RUN /opt/conda/bin/pip install \
     jupyterhub==0.6.* \
     oauthenticator==0.4.* \
-    dockerspawner==0.4.*    
+    dockerspawner==0.4.*
+
+COPY ./configs/supervisord.conf /srv/jupyterhub/configs/supervisord.conf
+
 
 # Copy TLS certificate and key
-ENV SSL_CERT /srv/jupyterhub/secrets/jupyterhub.crt
-ENV SSL_KEY /srv/jupyterhub/secrets/jupyterhub.key
+#ENV SSL_CERT /srv/jupyterhub/secrets/jupyterhub.crt
+#ENV SSL_KEY /srv/jupyterhub/secrets/jupyterhub.key
 #COPY ./secrets/*.crt $SSL_CERT
 #COPY ./secrets/*.key $SSL_KEY
 
-COPY /etc/pki/tls/certs/jupyterhub.bham.ac.uk-full-cert-intermediates.pem $SSL_CERT
-COPY /etc/pki/tls/private/jupyterhub.bham.ac.uk.key $SSL_KEY
+#COPY /etc/pki/tls/certs/jupyterhub.bham.ac.uk-full-cert-intermediates.pem $SSL_CERT
+#COPY /etc/pki/tls/private/jupyterhub.bham.ac.uk.key $SSL_KEY
 
-RUN chmod 700 /srv/jupyterhub/secrets && \
-    chmod 600 /srv/jupyterhub/secrets/*
+#RUN chmod 700 /srv/jupyterhub/secrets && \
+#    chmod 600 /srv/jupyterhub/secrets/*
 
 COPY ./userlist /srv/jupyterhub/userlist
 RUN mkdir -p /var/log/supervisor
-COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
+COPY ./configs/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
+#COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 
 #ADD swarmspawner.py /srv/jupyterhub_config/swarmspawner.py
 
 #ENV DOCKER_HOST https://swarm:2375
-
+#CMD ["/usr/bin/supervisord -c /srv/jupyterhub/configs/supervisord.conf"]
 CMD ["/usr/bin/supervisord"]

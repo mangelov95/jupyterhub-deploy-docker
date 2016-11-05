@@ -36,7 +36,7 @@ c.SystemUserSpawner.extra_host_config = { 'network_mode': network_name }
 # it.  Most jupyter/docker-stacks *-notebook images run the Notebook server as
 # user `jovyan`, and set the notebook directory to `/home/jovyan/work`.
 # We follow the same convention.
-#notebook_dir = os.environ.get('DOCKER_NOTEBOOK_DIR') or '/home/jovyan/work'
+notebook_dir = os.environ.get('DOCKER_NOTEBOOK_DIR') or '/rds/homes/a/angelovm'
 #c.SystemUserSpawner.notebook_dir = notebook_dir
 # Mount the real user's Docker volume on the host to the notebook user's
 # notebook directory in the container
@@ -47,12 +47,26 @@ c.SystemUserSpawner.remove_containers = True
 # For debugging arguments passed to spawned containers
 #c.DockerSpawner.debug = True
 
+# DEBUG SETTINGS!!!
+
+c.JupyterHub.log_level = 'DEBUG'
+c.SystemUserSpawner.debug = True
+
+# END OF DEBUG SETTINGS
+
+
 # TLS CONFIG FOR DOCKER SWARM
 
 c.SystemUserSpawner.tls_verify = True
-c.SystemUserSpawner.tls_ca = os.environ['DOCKER_CERT_PATH'] + '/ca.pem'
-c.SystemUserSpawner.tls_cert = os.environ['DOCKER_CERT_PATH'] + '/novalocal-cert.pem' 
-c.SystemUserSpawner.tls_key = os.environ['DOCKER_CERT_PATH'] + '/novalocal-priv-key.pem' 
+#c.SystemUserSpawner.tls_assert_hostname = True
+#c.SystemUserSpawner.tls_ca = os.environ['DOCKER_CERT_PATH'] + '/ca.pem'
+#c.SystemUserSpawner.tls_cert = os.environ['DOCKER_CERT_PATH'] + '/novalocal-cert.pem' 
+#c.SystemUserSpawner.tls_key = os.environ['DOCKER_CERT_PATH'] + '/novalocal-priv-key.pem' 
+
+c.SystemUserSpawner.tls_ca = '/root/.certs/ca.pem'
+c.SystemUserSpawner.tls_cert = '/root/.certs/novalocal-cert.pem'
+c.SystemUserSpawner.tls_key = '/root/.certs/novalocal-priv-key.pem'
+
 
 # END OF TLS CONFIG FOR DOCKER SWARM
 

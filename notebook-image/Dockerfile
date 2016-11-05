@@ -27,7 +27,6 @@ COPY ./files/profile.d/OMPI_openib_if_include.sh /etc/profile.d/OMPI_openib_if_i
 COPY ./files/krb5.conf /etc/krb5.conf
 COPY ./files/ldap.conf /etc/ldap.conf
 COPY ./files/nslcd.conf /etc/nslcd.conf
-COPY ./files/hub_hosts /etc/hosts
 
 
 # Fix config and add nslcd service to start on startup
