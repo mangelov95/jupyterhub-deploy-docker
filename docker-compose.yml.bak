@@ -1,0 +1,62 @@
+# Copyright (c) Jupyter Development Team.
+# Distributed under the terms of the Modified BSD License.
+
+# JupyterHub docker-compose configuration file
+version: "2"
+
+services:
+  hub:
+    build:
+      context: .
+      dockerfile: Dockerfile.jupyterhub
+    image: jupyterhub
+    container_name: jupyterhub
+    volumes:
+      # Bind Docker binary from host machine so we can invoke Docker commands
+      # from inside container
+      - "/usr/local/bin/docker:/usr/local/bin/docker:ro"
+      # Bind Docker socket on the host so we can connect to the daemon from
+      # within the container
+      - "/var/run/docker.sock:/var/run/docker.sock:rw"
+      # TLS certs for Docker Swarm
+      - "/root/.certs:/root/.certs:rw"
+      # Set TLS certs for Jupyterhub URL host
+      - "/etc/pki/tls:/srv/jupyterhub/secrets:ro"
+      # Mount jupyterhub_config file
+      - "/root/jupyterhub:/jupyterhub:rw"
+      # Bind Docker volume on host for JupyterHub database and cookie secrets
+      #- "data:${DATA_VOLUME_CONTAINER}"
+    ports:
+      - "443:443"
+    environment:
+      # All containers will join this network
+#      "constraint:node=": "hub-swarm-manager-*"
+      SSL_CERT: "/srv/jupyterhub/secrets/certs/jupyterhub.bham.ac.uk-full-cert-intermediates.pem"
+      SSL_KEY: "/srv/jupyterhub/secrets/private/jupyterhub.bham.ac.uk.key"
+      DOCKER_TLS_VERIFY: 1
+      DOCKER_HOST: "tcp://hub-swarm-manager-1.novalocal:3376"
+#      DOCKER_HOST: "tcp://192.168.3.39:3376"
+      DOCKER_CERT_PATH: "/root/.certs"
+      DOCKER_NETWORK_NAME: ${DOCKER_NETWORK_NAME}
+      # JupyterHub will spawn this Notebook image for users
+      DOCKER_NOTEBOOK_IMAGE: ${DOCKER_NOTEBOOK_IMAGE}
+      # Notebook directory inside user image
+      DOCKER_NOTEBOOK_DIR: ${DOCKER_NOTEBOOK_DIR}
+      # Using this run command (optional)
+      DOCKER_SPAWN_CMD: ${DOCKER_SPAWN_CMD}
+      # Required to authenticate users using GitHub OAuth
+      #GITHUB_CLIENT_ID: ${GITHUB_CLIENT_ID}
+      #GITHUB_CLIENT_SECRET: ${GITHUB_CLIENT_SECRET}
+      #OAUTH_CALLBACK_URL: ${OAUTH_CALLBACK_URL}
+    # command: >
+     # jupyterhub -f /srv/jupyterhub/jupyterhub_config.py
+
+#volumes:
+#  data:
+#    external:
+#      name: ${DATA_VOLUME_HOST}
+
+networks:
+  default:
+    external:
+      name: ${DOCKER_NETWORK_NAME}

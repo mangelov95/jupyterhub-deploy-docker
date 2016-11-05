@@ -1,0 +1,111 @@
+# Copyright (c) Jupyter Development Team.
+# Distributed under the terms of the Modified BSD License.
+
+# Configuration file for JupyterHub
+import os
+
+c = get_config()
+
+# We rely on environment variables to configure JupyterHub so that we
+# avoid having to rebuild the JupyterHub container every time we change a
+# configuration parameter.
+
+# Spawn single-user servers as Docker containers
+#c.JupyterHub.spawner_class = 'dockerspawner.DockerSpawner'
+c.JupyterHub.spawner_class = 'dockerspawner.SystemUserSpawner'
+#c.JupyterHub.spawner_class = 'swarmspawner.SwarmSpawner'
+c.SystemUserSpawner.container_image = os.environ['DOCKER_NOTEBOOK_IMAGE']
+
+# Spawn containers from this image
+#c.DockerSpawner.container_image = os.environ['DOCKER_NOTEBOOK_IMAGE']
+# JupyterHub requires a single-user instance of the Notebook server, so we
+# default to using the `start-singleuser.sh` script included in the
+# jupyter/docker-stacks *-notebook images as the Docker run command when
+# spawning containers.  Optionally, you can override the Docker run command
+# using the DOCKER_SPAWN_CMD environment variable.
+spawn_cmd = os.environ.get('DOCKER_SPAWN_CMD', "start-singleuser.sh")
+c.SystemUserSpawner.extra_create_kwargs.update({ 'command': spawn_cmd })
+# Connect containers to this Docker network
+network_name = os.environ['DOCKER_NETWORK_NAME']
+c.SystemUserSpawner.use_internal_ip = True
+c.SystemUserSpawner.network_name = network_name
+# Pass the network name as argument to spawned containers
+c.SystemUserSpawner.extra_host_config = { 'network_mode': network_name }
+#c.SystemUserSpawner.extra_start_kwargs = { 'network_mode': network_name }
+# Explicitly set notebook directory because we'll be mounting a host volume to
+# it.  Most jupyter/docker-stacks *-notebook images run the Notebook server as
+# user `jovyan`, and set the notebook directory to `/home/jovyan/work`.
+# We follow the same convention.
+#notebook_dir = '/rds/homes/{username[0]}/{username}/.notebook'
+# Mount the real user's Docker volume on the host to the notebook user's
+# notebook directory in the container
+#c.SystemUserSpawner.volumes = { 'jupyterhub-user-{username}': notebook_dir }
+#c.SystemUserSpawner.extra_create_kwargs.update({ 'volume_driver': 'local' })
+
+
+c.SystemUserSpawner.host_homedir_format_string = '/rds/homes/{username[0]}/{username}'
+c.SystemUserSpawner.notebook_dir =  '.notebook'
+
+
+# Remove containers once they are stopped
+c.SystemUserSpawner.remove_containers = True
+# For debugging arguments passed to spawned containers
+#c.DockerSpawner.debug = True
+
+# DEBUG SETTINGS!!!
+
+c.JupyterHub.log_level = 'DEBUG'
+c.SystemUserSpawner.debug = True
+
+# END OF DEBUG SETTINGS
+
+
+# TLS CONFIG FOR DOCKER SWARM
+
+c.SystemUserSpawner.tls_verify = True
+#c.SystemUserSpawner.tls_assert_hostname = True
+#c.SystemUserSpawner.tls_ca = os.environ['DOCKER_CERT_PATH'] + '/ca.pem'
+#c.SystemUserSpawner.tls_cert = os.environ['DOCKER_CERT_PATH'] + '/novalocal-cert.pem' 
+#c.SystemUserSpawner.tls_key = os.environ['DOCKER_CERT_PATH'] + '/novalocal-priv-key.pem' 
+
+c.SystemUserSpawner.tls_ca = '/root/.certs/ca.pem'
+c.SystemUserSpawner.tls_cert = '/root/.certs/novalocal-cert.pem'
+c.SystemUserSpawner.tls_key = '/root/.certs/novalocal-priv-key.pem'
+
+
+# END OF TLS CONFIG FOR DOCKER SWARM
+
+
+# User containers will access hub by container name on the Docker network
+c.JupyterHub.hub_ip = 'jupyterhub'
+c.JupyterHub.hub_port = 8000
+
+# TLS config
+c.JupyterHub.port = 443
+c.JupyterHub.ssl_key = os.environ['SSL_KEY']
+c.JupyterHub.ssl_cert = os.environ['SSL_CERT']
+
+## Authenticate users with GitHub OAuth
+#c.JupyterHub.authenticator_class = 'oauthenticator.GitHubOAuthenticator'
+#c.GitHubOAuthenticator.oauth_callback_url = os.environ['OAUTH_CALLBACK_URL']
+
+## Persist hub data on volume mounted inside container
+#data_dir = os.environ.get('DATA_VOLUME_CONTAINER', '/data')
+#c.JupyterHub.db_url = os.path.join('sqlite:///', data_dir, 'jupyterhub.sqlite')
+#c.JupyterHub.cookie_secret_file = os.path.join(data_dir,
+#    'jupyterhub_cookie_secret')
+
+# Whitlelist users and admins
+#c.Authenticator.whitelist = whitelist = set()
+#c.Authenticator.admin_users = admin = set()
+#c.JupyterHub.admin_access = True
+#pwd = os.path.dirname(__file__)
+#with open(os.path.join(pwd, 'userlist')) as f:
+#    for line in f:
+#        if not line:
+#            continue
+#        parts = line.split()
+#        name = parts[0]
+#        whitelist.add(name)
+#        if len(parts) > 1 and parts[1] == 'admin':
+#            admin.add(name)
