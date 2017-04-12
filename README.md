@@ -1,5 +1,3 @@
-Uses Swarm with `Docker Machine`
-
 # jupyterhub-deploy-docker
 
 This repository provides a reference deployment of [JupyterHub](https://github.com/jupyter/jupyterhub), a multi-user [Jupyter Notebook](http://jupyter.org/) environment, on a **single host** using [Docker](https://docs.docker.com).  
